@@ -1,0 +1,89 @@
+Public Sub 添付ファイル保存()
+    On Error Resume Next
+    Dim objMsg As MailItem
+    Dim objAttach As Attachment
+     '保存先フォルダ
+    Const SAVE_PATH1 = "X:\ユーザ作業用フォルダ\G11_情報発信強化\G93_ツール調査・開発\告示\"
+    Const SAVE_PATH2 = "X:\ユーザ作業用フォルダ\G11_情報発信強化\G93_ツール調査・開発\公告\"
+    'メール件名に含まれるキーワード
+    Const KEYWORD1 = "告示"
+    Const KEYWORD2 = "公告"
+    
+    
+    '選択したメールに対しての処理
+    For Each objMsg In ActiveExplorer.Selection
+        With objMsg
+            'メール件名にキーワードが含まれているか判定
+            '告示
+            If InStr(.Subject, KEYWORD1) > 0 Then
+                '添付ファイルすべてについて処理
+                For Each objAttach In objMsg.Attachments
+                    With objAttach
+                        strFileName = SAVE_PATH1 & .FileName
+                        .SaveAsFile strFileName
+                    End With
+                Next
+                MsgBox "添付ファイルを【告示フォルダ】に保存しました。"
+            '公告
+            ElseIf InStr(.Subject, KEYWORD2) > 0 Then
+                '添付ファイルすべてについて処理
+                For Each objAttach In objMsg.Attachments
+                    With objAttach
+                        strFileName = SAVE_PATH2 & .FileName
+                        .SaveAsFile strFileName
+                    End With
+                Next
+                MsgBox "添付ファイルを【公告フォルダ】に保存しました。"
+            End If
+        End With
+    Next
+    Set objMsg = Nothing
+End Sub
+
+'新規メール受信時に自動振り分け処理（受け）
+Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
+    On Error Resume Next
+    Dim objMsg As MailItem
+    '
+    Set objMsg = Session.GetItemFromID(EntryIDCollection)
+    If Not objMsg Is Nothing Then
+        SaveAttachments objMsg
+    End If
+End Sub
+
+'新規メール受信時の自動振り分け処理（中身）
+Private Sub SaveAttachments(objMsg As MailItem)
+    Dim objAttach As Attachment
+     '保存先フォルダ
+    Const SAVE_PATH1 = "X:\ユーザ作業用フォルダ\G11_情報発信強化\G93_ツール調査・開発\告示\"
+    Const SAVE_PATH2 = "X:\ユーザ作業用フォルダ\G11_情報発信強化\G93_ツール調査・開発\公告\"
+    'メール件名に含まれるキーワード
+    Const KEYWORD1 = "告示"
+    Const KEYWORD2 = "公告"
+    
+    With objMsg
+        'メール件名にキーワードが含まれているか判定
+        '告示
+        If InStr(.Subject, KEYWORD1) > 0 Then
+            '添付ファイルすべてについて処理
+            For Each objAttach In objMsg.Attachments
+                With objAttach
+                    strFileName = SAVE_PATH1 & .FileName
+                    .SaveAsFile strFileName
+                End With
+            Next
+            MsgBox "添付ファイルを【告示フォルダ】に保存しました。"
+        '公告
+        ElseIf InStr(.Subject, KEYWORD2) > 0 Then
+            '添付ファイルすべてについて処理
+            For Each objAttach In objMsg.Attachments
+                With objAttach
+                    strFileName = SAVE_PATH2 & .FileName
+                    .SaveAsFile strFileName
+                End With
+            Next
+            MsgBox "添付ファイルを【公告フォルダ】に保存しました。"
+        End If
+    End With
+    Set objMsg = Nothing
+End Sub
